@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 6 Spelling Bee Competition</title>
+<style>
+:root {
+  --yellow:#ffd43b; --dark:#17202a; --honey:#ffb703; --cream:#fff8dc;
+  --green:#2a9d8f; --red:#e63946; --blue:#2d6cdf; --card:#ffffff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#fff9d6,#eaf7ff);color:var(--dark);overflow-x:hidden}
+nav{position:sticky;top:0;z-index:50;display:flex;justify-content:center;gap:10px;padding:10px;background:rgba(23,32,42,.94);backdrop-filter:blur(8px)}
+nav button{border:0;border-radius:999px;padding:10px 16px;font-weight:800;cursor:pointer;background:white;color:#222}
+nav button.active{background:var(--yellow)}
+.page{display:none;min-height:calc(100vh - 60px);padding:24px}
+.page.active{display:block}
+.wrap{max-width:1180px;margin:auto}
+.hero{position:relative;min-height:78vh;display:grid;place-items:center;text-align:center;overflow:hidden;border-radius:30px;background:
+radial-gradient(circle at 30% 20%,#fff 0 3%,transparent 4%),
+linear-gradient(145deg,#fff7b2,#ffd43b 60%,#ffb703);box-shadow:0 20px 60px rgba(0,0,0,.16)}
+.hero h1{font-size:clamp(42px,8vw,92px);margin:0;text-shadow:0 5px 0 rgba(255,255,255,.45)}
+.hero h2{font-size:clamp(20px,4vw,38px);margin:10px 0}
+.welcome{font-size:clamp(17px,2vw,24px);max-width:820px;margin:18px auto;line-height:1.5}
+.bigbtn{border:0;border-radius:18px;padding:15px 24px;font-size:18px;font-weight:900;cursor:pointer;margin:7px;box-shadow:0 8px 0 rgba(0,0,0,.18)}
+.voice{background:#17202a;color:white} .start{background:#fff;color:#222}
+.bee{position:absolute;font-size:72px;left:-100px;top:15%;animation:fly 8s ease-in-out infinite;filter:drop-shadow(0 8px 6px rgba(0,0,0,.18))}
+@keyframes fly{0%{left:-100px;top:16%;transform:rotate(-8deg)}35%{left:48%;top:8%;transform:rotate(8deg)}65%{left:72%;top:55%;transform:rotate(-10deg)}100%{left:105%;top:22%;transform:rotate(6deg)}}
+.spark{position:absolute;font-size:30px;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-18px) rotate(8deg)}}
+.title{text-align:center;font-size:42px;margin:8px 0 4px}
+.subtitle{text-align:center;color:#52606d;margin-bottom:25px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:var(--card);border-radius:22px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.10);border:3px solid transparent;transition:.2s}
+.card:hover{transform:translateY(-4px);border-color:var(--yellow)}
+.icon{font-size:46px} .word{font-size:25px;font-weight:900;margin:8px 0} .def{min-height:48px;color:#53606d;line-height:1.35}
+.audioBtn{width:100%;border:0;border-radius:14px;padding:10px;background:#17202a;color:white;font-weight:800;cursor:pointer}
+.practice{max-width:900px;margin:auto}
+.qcard{background:white;border-radius:24px;padding:22px;margin:16px 0;box-shadow:0 10px 28px rgba(0,0,0,.10)}
+.qtop{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.qnum{background:var(--yellow);font-weight:900;border-radius:50%;width:40px;height:40px;display:grid;place-items:center}
+.hint{font-size:40px}
+.prompt{font-size:22px;font-weight:800;flex:1}
+.answer{width:100%;font-size:20px;padding:13px;border-radius:14px;border:2px solid #cbd5e1;margin-top:12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.check,.listenBtn,.choiceBtn{border:0;border-radius:12px;padding:10px 15px;font-weight:900;cursor:pointer}
+.check{background:var(--green);color:white} .listenBtn{background:var(--blue);color:white}.choiceBtn{background:#eef4ff;color:#1d3557;margin:4px;border:2px solid #c9d8f5}.choiceBtn.selected{background:var(--yellow);border-color:#d89b00}.hiddenAnswer{display:none}
+.feedback{font-weight:900;margin-top:8px;min-height:24px}
+.scorebox{position:sticky;top:64px;z-index:10;background:#17202a;color:white;border-radius:18px;padding:13px 18px;margin:0 auto 18px;max-width:900px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.progress{height:10px;background:#d9e2ec;border-radius:999px;overflow:hidden;flex:1} .bar{height:100%;width:0;background:var(--yellow);transition:.3s}
+.note{background:#fff7c7;border-left:7px solid var(--honey);padding:14px;border-radius:12px;margin:16px 0}
+footer{text-align:center;padding:26px;color:#667}
+@media(max-width:600px){.page{padding:12px} .hero{border-radius:18px;min-height:82vh} .bee{font-size:54px}}
+
+/* Distinct practice question styles */
+.qcard[data-type="unscramble"]{background:linear-gradient(135deg,#fff8cc,#ffe88a);border:3px dashed #d9a400}
+.qcard[data-type="missing"],.qcard[data-type="vowel"]{background:linear-gradient(135deg,#eef9ff,#d7efff);border-left:10px solid #2d6cdf}
+.qcard[data-type="listen"]{background:linear-gradient(135deg,#f0ecff,#e5ddff);border:3px solid #7b61ff}
+.qcard[data-type="firstlast"]{background:linear-gradient(135deg,#eafff8,#d3f7eb);border:3px solid #2a9d8f}
+.qcard[data-type="choose"],.qcard[data-type="odd"]{background:linear-gradient(135deg,#fff0f3,#ffe0e7);border:3px solid #e76f91}
+.qcard[data-type="syllable"]{background:linear-gradient(135deg,#f8f4ff,#efe6ff);border-top:10px solid #8d5cf6}
+.qcard[data-type="definition"]{background:linear-gradient(135deg,#fff6e8,#ffe5bf);border:3px solid #f4a261}
+.qcard[data-type="typefromhint"]{background:linear-gradient(135deg,#efffea,#dcf9d1);border:3px solid #65a30d}
+.qcard[data-type="unscramble"] .qnum{background:#ffca28}
+.qcard[data-type="listen"] .qnum{background:#8b78ff;color:white}
+.qcard[data-type="choose"] .qnum,.qcard[data-type="odd"] .qnum{background:#e76f91;color:white}
+.qcard[data-type="definition"] .qnum{background:#f4a261;color:white}
+.qcard[data-type="typefromhint"] .qnum{background:#84cc16;color:white}
+.qcard .prompt span{display:inline-block;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.55)}
+.qcard[data-type="unscramble"] .prompt span{letter-spacing:5px;font-size:24px}
+.qcard[data-type="listen"] .listenBtn{font-size:17px;padding:12px 18px}
+
+</style>
+</head>
+<body>
+<nav>
+<button class="active" onclick="showPage('announce',this)">🐝 Announcement</button>
+<button onclick="showPage('words',this)">📚 Vocabulary</button>
+<button onclick="showPage('practice',this)">✍️ Practice</button>
+</nav>
+
+<section id="announce" class="page active">
+<div class="wrap">
+<div class="hero">
+<div class="bee">🐝</div>
+<div class="bee bee2">🐝</div>
+<div class="bee bee3">🐝</div>
+<div class="spark" style="left:8%;top:12%">✨</div>
+<div class="spark" style="right:10%;top:20%;animation-delay:.7s">⭐</div>
+<div class="spark" style="left:18%;bottom:12%;animation-delay:1.2s">🏆</div>
+<div>
+<div style="font-size:28px;font-weight:900">GRADE 6</div>
+<h1>Spelling Bee</h1>
+<h2>Competition Challenge 🏆</h2>
+<p class="welcome" id="welcomeText">Welcome, super spellers! Get ready to listen, learn, spell, and shine. Study the competition words, use the audio buttons to hear each word, and challenge yourself in the spelling practice.</p>
+<button class="bigbtn voice" onclick="speakWelcome()">🔊 Play Welcome Voice</button>
+<button class="bigbtn start" onclick="goWords()">Start Learning →</button>
+<div class="note" style="max-width:760px;margin:22px auto 0;text-align:left">
+<strong>Competition Tip:</strong> Listen carefully, say the word, break it into syllables, visualize the meaning, then spell it slowly before writing your final answer.
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="words" class="page">
+<div class="wrap">
+<h1 class="title">Competition Vocabulary</h1>
+<p class="subtitle">Tap 🔊 to hear each word. Use the picture icon and short meaning to remember it.</p>
+<div class="grid" id="wordGrid"></div>
+</div>
+</section>
+
+<section id="practice" class="page">
+<div class="scorebox"><strong id="scoreText">Score: 0 / 0</strong><div class="progress"><div class="bar" id="bar"></div></div></div>
+<div class="practice">
+<h1 class="title">Spelling Practice</h1>
+<p class="subtitle">Practice with many spelling styles: unscramble, missing letters, listen-and-spell, word chunks, definitions, first/last letter clues, visual clues, and correct-spelling choices. Every question includes an icon hint.</p>
+<div id="questions"></div>
+<button class="bigbtn voice" onclick="resetPractice()">↻ Try Again</button>
+</div>
+</section>
+
+<footer>Grade 6 Spelling Bee • Interactive study page</footer>
+
+<script>
+const words = [{"w": "crater", "i": "🕳️", "d": "a bowl-shaped hole in the ground"}, {"w": "volcano", "i": "🌋", "d": "a mountain that can erupt"}, {"w": "lava", "i": "🔥", "d": "hot melted rock from a volcano"}, {"w": "glacier", "i": "🧊", "d": "a huge slow-moving mass of ice"}, {"w": "mud pots", "i": "♨️", "d": "hot bubbling pools of mud"}, {"w": "geyser", "i": "💦", "d": "a hot spring that shoots water and steam"}, {"w": "diagram", "i": "📊", "d": "a simple drawing that explains something"}, {"w": "hot spring", "i": "♨️", "d": "naturally heated water from the ground"}, {"w": "energy", "i": "⚡", "d": "power used to make things work"}, {"w": "turbine", "i": "🌀", "d": "a machine with blades turned by water, steam, or wind"}, {"w": "generator", "i": "⚙️", "d": "a machine that produces electricity"}, {"w": "solar cells", "i": "☀️", "d": "devices that turn sunlight into electricity"}, {"w": "tides", "i": "🌊", "d": "the regular rise and fall of sea level"}, {"w": "waterwheel", "i": "💧", "d": "a wheel turned by flowing water"}, {"w": "calculator", "i": "🧮", "d": "a device used to calculate numbers"}, {"w": "windmill", "i": "🌬️", "d": "a structure with blades turned by wind"}, {"w": "barrier", "i": "🚧", "d": "something that blocks movement"}, {"w": "geologist", "i": "🪨", "d": "a scientist who studies rocks and Earth"}, {"w": "steam", "i": "☁️", "d": "hot water vapor"}, {"w": "electricity", "i": "💡", "d": "energy carried by electric current"}, {"w": "terrible", "i": "😟", "d": "very bad or unpleasant"}, {"w": "peculiar", "i": "🤔", "d": "strange or unusual"}, {"w": "thrilling", "i": "🎢", "d": "very exciting"}];
+const questions = [{"type": "unscramble", "answer": "volcano", "display": "N O C A V O L", "icon": "🌋"}, {"type": "unscramble", "answer": "glacier", "display": "C I G A L E R", "icon": "🧊"}, {"type": "missing", "answer": "electricity", "display": "e l e c t r _ c i t y", "icon": "💡"}, {"type": "missing", "answer": "calculator", "display": "c a l c u l a t _ r", "icon": "🧮"}, {"type": "listen", "answer": "geyser", "display": "Listen and spell the word.", "icon": "💦"}, {"type": "listen", "answer": "generator", "display": "Listen and spell the word.", "icon": "⚙️"}, {"type": "firstlast", "answer": "barrier", "display": "Starts with <b>b</b> and ends with <b>r</b>.", "icon": "🚧"}, {"type": "firstlast", "answer": "geologist", "display": "Starts with <b>g</b> and ends with <b>t</b>.", "icon": "🪨"}, {"type": "choose", "answer": "peculiar", "options": ["peculear", "peculiar", "peculliar"], "display": "Choose the correctly spelled word.", "icon": "🤔"}, {"type": "choose", "answer": "thrilling", "options": ["thriling", "thrilling", "thrilingg"], "display": "Choose the correctly spelled word.", "icon": "🎢"}, {"type": "syllable", "answer": "turbine", "display": "tur + ____", "icon": "🌀"}, {"type": "syllable", "answer": "waterwheel", "display": "water + ____", "icon": "💧"}, {"type": "definition", "answer": "crater", "display": "A bowl-shaped hole in the ground.", "icon": "🕳️"}, {"type": "definition", "answer": "steam", "display": "Hot water vapor.", "icon": "☁️"}, {"type": "vowel", "answer": "energy", "display": "e n _ r g y", "icon": "⚡"}, {"type": "vowel", "answer": "terrible", "display": "t e r r _ b l e", "icon": "😟"}, {"type": "odd", "answer": "windmill", "options": ["windmill", "windmil", "windmell"], "display": "Find the word with correct spelling.", "icon": "🌬️"}, {"type": "odd", "answer": "diagram", "options": ["diagrem", "diagram", "diagraam"], "display": "Find the word with correct spelling.", "icon": "📊"}, {"type": "typefromhint", "answer": "solar cells", "display": "☀️ + electricity devices", "icon": "☀️"}, {"type": "typefromhint", "answer": "hot spring", "display": "♨️ naturally heated water", "icon": "♨️"}, {"type": "listen", "answer": "tides", "display": "Listen and spell the word.", "icon": "🌊"}, {"type": "unscramble", "answer": "mud pots", "display": "D U M &nbsp;&nbsp; S T O P", "icon": "♨️"}, {"type": "definition", "answer": "lava", "display": "Hot melted rock from a volcano.", "icon": "🔥"}];
+let completed = new Set(), correct = new Set();
+
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goWords(){showPage('words',document.querySelectorAll('nav button')[1])}
+
+function speak(text, rate=0.82){
+  if(!('speechSynthesis' in window)){alert('Audio voice is not supported in this browser.'); return;}
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=rate; u.pitch=1.05;
+  speechSynthesis.speak(u);
+}
+function speakWelcome(){
+ speak("Welcome to the Grade Six Spelling Bee Competition! Hello, super spellers! Get ready to listen, learn, spell, and shine. Study every word carefully, use the picture hints, practice the spelling challenges, and do your best. Good luck, and enjoy the Spelling Bee!");
+}
+
+const grid=document.getElementById('wordGrid');
+words.forEach((x,idx)=>{
+  const c=document.createElement('div'); c.className='card';
+  c.innerHTML=`<div class="icon">${x.i}</div><div class="word">${x.w}</div><div class="def">${x.d}</div><button class="audioBtn">🔊 Hear the word</button>`;
+  c.querySelector('button').onclick=()=>speak(x.w,.72);
+  grid.appendChild(c);
+});
+
+const qwrap=document.getElementById('questions');
+questions.forEach((q,idx)=>{
+  const el=document.createElement('div'); el.className='qcard'; el.id='q'+idx; el.setAttribute('data-type',q.type);
+  let label = q.type==='unscramble' ? 'Unscramble the letters:' : q.type==='missing' ? 'Complete the missing letter:' : 'Listen and spell:';
+  let extra = q.type==='listen' ? `<button class="listenBtn" onclick="speak('${q.answer}',.70)">🔊 Play Word</button>` : '';
+  el.innerHTML=`
+    <div class="qtop"><div class="qnum">${idx+1}</div><div class="hint">${q.icon}</div><div class="prompt">${label} <span style="color:#2d6cdf">${q.display}</span></div></div>
+    <input class="answer" type="text" autocomplete="off" spellcheck="false" placeholder="Type your spelling here">
+    <div class="actions">${extra}<button class="check" onclick="checkAnswer(${idx})">✓ Word Check</button></div>
+    <div class="feedback"></div>`;
+  qwrap.appendChild(el);
+});
+
+function norm(s){return s.toLowerCase().trim().replace(/\s+/g,' ')}
+function checkAnswer(i){
+  const card=document.getElementById('q'+i), input=card.querySelector('input'), fb=card.querySelector('.feedback');
+  const ok=norm(input.value)===norm(questions[i].answer);
+  completed.add(i);
+  if(ok){correct.add(i); fb.textContent='✅ Correct! Excellent spelling!'; fb.style.color='#16836f';}
+  else{correct.delete(i); fb.textContent='❌ Try again. Use the icon hint or listen carefully.'; fb.style.color='#d62828';}
+  updateScore();
+}
+function updateScore(){
+  document.getElementById('scoreText').textContent=`Score: ${correct.size} / ${questions.length}`;
+  document.getElementById('bar').style.width=(completed.size/questions.length*100)+'%';
+}
+function resetPractice(){
+  completed.clear(); correct.clear();
+  document.querySelectorAll('.answer').forEach(x=>x.value='');
+  document.querySelectorAll('.feedback').forEach(x=>x.textContent='');
+  document.querySelectorAll('.choiceBtn').forEach(x=>x.classList.remove('selected'));
+  updateScore(); window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
